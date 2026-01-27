@@ -12,12 +12,12 @@ exports.findAll = async () => {
   const [rows] = await db.query(
     `SELECT 
        reports.*,
-       CONCAT(Users.firstName, ' ', Users.lastName) AS reporter_name,
-       Users.email AS reporter_email,
-       CONCAT(Cars.title, ' ', Cars.model, ' ', Cars.year) AS car_title
+       CONCAT(users.firstName, ' ', users.lastName) AS reporter_name,
+       users.email AS reporter_email,
+       CONCAT(cars.title, ' ', cars.model, ' ', cars.year) AS car_title
      FROM reports
-     LEFT JOIN Users ON reports.user_id = Users.id
-     LEFT JOIN Cars ON reports.car_id = Cars.id
+     LEFT JOIN users ON reports.user_id = users.id
+     LEFT JOIN cars ON reports.car_id = cars.id
      ORDER BY reports.created_at DESC`
   );
   return rows;
@@ -27,12 +27,12 @@ exports.findById = async (id) => {
   const [rows] = await db.query(
     `SELECT 
        reports.*,
-       CONCAT(Users.firstName, ' ', Users.lastName) AS reporter_name,
-       Users.email AS reporter_email,
-       CONCAT(Cars.title, ' ', Cars.model, ' ', Cars.year) AS car_title
+       CONCAT(users.firstName, ' ', users.lastName) AS reporter_name,
+       users.email AS reporter_email,
+       CONCAT(cars.title, ' ', cars.model, ' ', cars.year) AS car_title
      FROM reports
-     LEFT JOIN Users ON reports.user_id = Users.id
-     LEFT JOIN Cars ON reports.car_id = Cars.id
+     LEFT JOIN users ON reports.user_id = users.id
+     LEFT JOIN cars ON reports.car_id = cars.id
      WHERE reports.id = ?`,
     [id]
   );
