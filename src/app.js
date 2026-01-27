@@ -10,12 +10,23 @@ const emailRoutes = require('./routes/email.routes');
 const userRoutes = require('./routes/user.routes');
 const carController = require('./controllers/carController');
 const cors = require("cors");
-
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      process.env.FRONTEND_URL
+    ];
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));
+
 
 app.use(express.json());
 
