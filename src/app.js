@@ -12,10 +12,11 @@ const carController = require('./controllers/carController');
 const cors = require("cors");
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));
+
 app.use(express.json());
 
 // ===== IMAGE SERVING ROUTE (must come before car routes) =====
