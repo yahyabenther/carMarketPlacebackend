@@ -3,7 +3,7 @@ const db = require('../config/db');
 const Favorites = {
   addFavorite: async (userId, carId) => {
     const [result] = await db.query(
-      'INSERT INTO Favorites (user_id, car_id) VALUES (?, ?)',
+      'INSERT INTO favorites (user_id, car_id) VALUES (?, ?)',
       [userId, carId]
     );
     return result.affectedRows;
@@ -11,7 +11,7 @@ const Favorites = {
 
   removeFavorite: async (userId, carId) => {
     const [result] = await db.query(
-      'DELETE FROM Favorites WHERE user_id = ? AND car_id = ?',
+      'DELETE FROM favorites WHERE user_id = ? AND car_id = ?',
       [userId, carId]
     );
     return result.affectedRows;
@@ -20,17 +20,17 @@ const Favorites = {
   findByUser: async (userId) => {
     try {
       const [rows] = await db.query(
-        `SELECT Cars.* 
-         FROM Favorites 
-         JOIN Cars ON Favorites.car_id = Cars.id
-         WHERE Favorites.user_id = ?`,
+        `SELECT cars.* 
+         FROM favorites 
+         JOIN cars ON favorites.car_id = cars.id
+         WHERE favorites.user_id = ?`,
         [userId]
       );
 
       // Get images for each car (same pattern as car.model.js)
       for (let car of rows) {
         const [images] = await db.query(
-          'SELECT id, originalName, fileSize, mimeType FROM Images WHERE car_id = ?',
+          'SELECT id, originalName, fileSize, mimeType FROM images WHERE car_id = ?',
           [car.id]
         );
         car.images = images;

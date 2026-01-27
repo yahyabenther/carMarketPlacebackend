@@ -5,23 +5,23 @@ const db = require('../config/db');
 // ============================================
 
 exports.findByEmail = async (email) => {
-  const [rows] = await db.query('SELECT * FROM Users WHERE email = ?', [email]);
+  const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
   return rows[0];
 };
 
 exports.findById = async (id) => {
-  const [rows] = await db.query('SELECT * FROM Users WHERE id = ?', [id]);
+  const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
   return rows[0];
 };
 
 exports.findAll = async () => {
-  const [rows] = await db.query('SELECT * FROM Users');
+  const [rows] = await db.query('SELECT * FROM users');
   return rows;
 };
 
 exports.create = async (user) => {
   const [result] = await db.query(
-    `INSERT INTO Users 
+    `INSERT INTO users 
     (firstName, lastName, email, phone, password, verificationCode, verificationCodeExpiry, avatar, avatarMimeType) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
@@ -86,7 +86,7 @@ exports.updateUser = async (id, updates) => {
 
   values.push(id);
 
-  const query = `UPDATE Users SET ${fields.join(', ')} WHERE id = ?`;
+  const query = `UPDATE users SET ${fields.join(', ')} WHERE id = ?`;
   const [result] = await db.query(query, values);
   return result.affectedRows > 0;
 };
@@ -97,7 +97,7 @@ exports.updateUser = async (id, updates) => {
 
 exports.updatePassword = async (id, newPassword) => {
   const [result] = await db.query(
-    'UPDATE Users SET password = ? WHERE id = ?',
+    'UPDATE users SET password = ? WHERE id = ?',
     [newPassword, id]
   );
   return result.affectedRows > 0;
@@ -109,7 +109,7 @@ exports.updatePassword = async (id, newPassword) => {
 
 exports.updateVerificationCode = async (id, verificationCode, verificationCodeExpiry) => {
   const [result] = await db.query(
-    'UPDATE Users SET verificationCode = ?, verificationCodeExpiry = ? WHERE id = ?',
+    'UPDATE users SET verificationCode = ?, verificationCodeExpiry = ? WHERE id = ?',
     [verificationCode, verificationCodeExpiry, id]
   );
   return result.affectedRows > 0;
@@ -117,7 +117,7 @@ exports.updateVerificationCode = async (id, verificationCode, verificationCodeEx
 
 exports.isVerificationCodeValid = async (email, verificationCode) => {
   const [rows] = await db.query(
-    'SELECT * FROM Users WHERE email = ? AND verificationCode = ? AND verificationCodeExpiry > NOW()',
+    'SELECT * FROM users WHERE email = ? AND verificationCode = ? AND verificationCodeExpiry > NOW()',
     [email, verificationCode]
   );
   return rows[0] || null;
@@ -125,7 +125,7 @@ exports.isVerificationCodeValid = async (email, verificationCode) => {
 
 exports.verifyEmail = async (email, verificationCode) => {
   const [result] = await db.query(
-    'UPDATE Users SET isVerified = true, verificationCode = NULL, verificationCodeExpiry = NULL WHERE email = ? AND verificationCode = ?',
+    'UPDATE users SET isVerified = true, verificationCode = NULL, verificationCodeExpiry = NULL WHERE email = ? AND verificationCode = ?',
     [email, verificationCode]
   );
   return result.affectedRows > 0;
@@ -133,7 +133,7 @@ exports.verifyEmail = async (email, verificationCode) => {
 
 exports.findByVerificationCode = async (verificationCode) => {
   const [rows] = await db.query(
-    'SELECT * FROM Users WHERE verificationCode = ? AND verificationCodeExpiry > NOW()',
+    'SELECT * FROM users WHERE verificationCode = ? AND verificationCodeExpiry > NOW()',
     [verificationCode]
   );
   return rows[0];
@@ -141,7 +141,7 @@ exports.findByVerificationCode = async (verificationCode) => {
 
 exports.clearVerificationCode = async (id) => {
   const [result] = await db.query(
-    'UPDATE Users SET verificationCode = NULL, verificationCodeExpiry = NULL WHERE id = ?',
+    'UPDATE users SET verificationCode = NULL, verificationCodeExpiry = NULL WHERE id = ?',
     [id]
   );
   return result.affectedRows > 0;
@@ -153,7 +153,7 @@ exports.clearVerificationCode = async (id) => {
 
 exports.setResetCode = async (id, resetCode, resetCodeExpiry) => {
   const [result] = await db.query(
-    'UPDATE Users SET resetCode = ?, resetCodeExpiry = ? WHERE id = ?',
+    'UPDATE users SET resetCode = ?, resetCodeExpiry = ? WHERE id = ?',
     [resetCode, resetCodeExpiry, id]
   );
   return result.affectedRows > 0;
@@ -161,7 +161,7 @@ exports.setResetCode = async (id, resetCode, resetCodeExpiry) => {
 
 exports.isResetCodeValid = async (email, resetCode) => {
   const [rows] = await db.query(
-    'SELECT * FROM Users WHERE email = ? AND resetCode = ? AND resetCodeExpiry > NOW()',
+    'SELECT * FROM users WHERE email = ? AND resetCode = ? AND resetCodeExpiry > NOW()',
     [email, resetCode]
   );
   return rows[0] || null;
@@ -169,7 +169,7 @@ exports.isResetCodeValid = async (email, resetCode) => {
 
 exports.findByResetCode = async (resetCode) => {
   const [rows] = await db.query(
-    'SELECT * FROM Users WHERE resetCode = ? AND resetCodeExpiry > NOW()',
+    'SELECT * FROM users WHERE resetCode = ? AND resetCodeExpiry > NOW()',
     [resetCode]
   );
   return rows[0];
@@ -177,7 +177,7 @@ exports.findByResetCode = async (resetCode) => {
 
 exports.resetPassword = async (email, resetCode, newPassword) => {
   const [result] = await db.query(
-    'UPDATE Users SET password = ?, resetCode = NULL, resetCodeExpiry = NULL WHERE email = ? AND resetCode = ?',
+    'UPDATE users SET password = ?, resetCode = NULL, resetCodeExpiry = NULL WHERE email = ? AND resetCode = ?',
     [newPassword, email, resetCode]
   );
   return result.affectedRows > 0;
@@ -185,7 +185,7 @@ exports.resetPassword = async (email, resetCode, newPassword) => {
 
 exports.clearResetCode = async (id) => {
   const [result] = await db.query(
-    'UPDATE Users SET resetCode = NULL, resetCodeExpiry = NULL WHERE id = ?',
+    'UPDATE users SET resetCode = NULL, resetCodeExpiry = NULL WHERE id = ?',
     [id]
   );
   return result.affectedRows > 0;
@@ -196,6 +196,6 @@ exports.clearResetCode = async (id) => {
 // ============================================
 
 exports.deleteById = async (id) => {
-  const [result] = await db.query('DELETE FROM Users WHERE id = ?', [id]);
+  const [result] = await db.query('DELETE FROM users WHERE id = ?', [id]);
   return result.affectedRows > 0;
 };

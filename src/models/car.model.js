@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 exports.findAll = async (limit = null) => {
   try {
-    let query = 'SELECT * FROM Cars WHERE status="available" ORDER BY created_at DESC';
+    let query = 'SELECT * FROM cars WHERE status="available" ORDER BY created_at DESC';
     let params = [];
 
     if (limit) {
@@ -15,7 +15,7 @@ exports.findAll = async (limit = null) => {
     // Get images for each car
     for (let car of rows) {
       const [images] = await db.query(
-        'SELECT id, originalName, fileSize, mimeType FROM Images WHERE car_id = ?',
+        'SELECT id, originalName, fileSize, mimeType FROM images WHERE car_id = ?',
         [car.id]
       );
       car.images = images;
@@ -30,12 +30,12 @@ exports.findAll = async (limit = null) => {
 
 exports.findById = async (id) => {
   try {
-    const [rows] = await db.query('SELECT * FROM Cars WHERE id=?', [id]);
+    const [rows] = await db.query('SELECT * FROM cars WHERE id=?', [id]);
     const car = rows[0];
 
     if (car) {
       const [images] = await db.query(
-        'SELECT id, originalName, fileSize, mimeType FROM Images WHERE car_id = ?',
+        'SELECT id, originalName, fileSize, mimeType FROM images WHERE car_id = ?',
         [id]
       );
       car.images = images;
@@ -51,13 +51,13 @@ exports.findById = async (id) => {
 exports.findByOwnerId = async (ownerId) => {
   try {
     const [rows] = await db.query(
-      'SELECT * FROM Cars WHERE user_id = ? ORDER BY created_at DESC',
+      'SELECT * FROM cars WHERE user_id = ? ORDER BY created_at DESC',
       [ownerId]
     );
 
     for (let car of rows) {
       const [images] = await db.query(
-        'SELECT id, originalName, fileSize, mimeType FROM Images WHERE car_id = ?',
+        'SELECT id, originalName, fileSize, mimeType FROM images WHERE car_id = ?',
         [car.id]
       );
       car.images = images;
@@ -73,7 +73,7 @@ exports.findByOwnerId = async (ownerId) => {
 exports.create = async (car) => {
   try {
     const [result] = await db.query(
-      `INSERT INTO Cars (title, brand, model, year, price, mileage, fuel, transmission, location, user_id, status)
+      `INSERT INTO cars (title, brand, model, year, price, mileage, fuel, transmission, location, user_id, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         car.title || `${car.year} ${car.brand} ${car.model}`,
@@ -100,7 +100,7 @@ exports.create = async (car) => {
 exports.update = async (id, car) => {
   try {
     await db.query(
-      `UPDATE Cars SET title=?, brand=?, model=?, year=?, price=?, mileage=?, fuel=?, transmission=?, location=? WHERE id=?`,
+      `UPDATE cars SET title=?, brand=?, model=?, year=?, price=?, mileage=?, fuel=?, transmission=?, location=? WHERE id=?`,
       [
         car.title || `${car.year} ${car.brand} ${car.model}`,
         car.brand,
@@ -123,7 +123,7 @@ exports.update = async (id, car) => {
 
 exports.updateStatus = async (id, status) => {
   try {
-    await db.query('UPDATE Cars SET status=? WHERE id=?', [status, id]);
+    await db.query('UPDATE cars SET status=? WHERE id=?', [status, id]);
     return true;
   } catch (error) {
     console.error('Error in updateStatus:', error);
@@ -134,9 +134,9 @@ exports.updateStatus = async (id, status) => {
 exports.delete = async (id) => {
   try {
     // Delete images first
-    await db.query('DELETE FROM Images WHERE car_id = ?', [id]);
+    await db.query('DELETE FROM images WHERE car_id = ?', [id]);
     // Then delete car
-    await db.query('DELETE FROM Cars WHERE id=?', [id]);
+    await db.query('DELETE FROM cars WHERE id=?', [id]);
     return true;
   } catch (error) {
     console.error('Error in delete:', error);
@@ -148,13 +148,13 @@ exports.search = async (query) => {
   try {
     const searchTerm = `%${query}%`;
     const [rows] = await db.query(
-      `SELECT * FROM Cars WHERE status="available" AND (title LIKE ? OR brand LIKE ? OR model LIKE ? OR location LIKE ?)`,
+      `SELECT * FROM cars WHERE status="available" AND (title LIKE ? OR brand LIKE ? OR model LIKE ? OR location LIKE ?)`,
       [searchTerm, searchTerm, searchTerm, searchTerm]
     );
 
     for (let car of rows) {
       const [images] = await db.query(
-        'SELECT id, originalName, fileSize, mimeType FROM Images WHERE car_id = ?',
+        'SELECT id, originalName, fileSize, mimeType FROM images WHERE car_id = ?',
         [car.id]
       );
       car.images = images;
@@ -169,7 +169,7 @@ exports.search = async (query) => {
 
 exports.filter = async (filters) => {
   try {
-    let query = 'SELECT * FROM Cars WHERE status="available"';
+    let query = 'SELECT * FROM cars WHERE status="available"';
     let params = [];
 
     if (filters.brand) {
@@ -219,7 +219,7 @@ exports.filter = async (filters) => {
 
     for (let car of rows) {
       const [images] = await db.query(
-        'SELECT id, originalName, fileSize, mimeType FROM Images WHERE car_id = ?',
+        'SELECT id, originalName, fileSize, mimeType FROM images WHERE car_id = ?',
         [car.id]
       );
       car.images = images;

@@ -1,19 +1,15 @@
-// src/server.js
 const http = require("http");
 const { Server } = require("socket.io");
 const app = require("./app");
-const socketSetup = require("./sockets/chat.socket"); // your chat socket handlers
+const socketSetup = require("./sockets/chat.socket");
 
-// Create HTTP server
 const server = http.createServer(app);
 
-// ===== Socket.IO setup =====
+
+
+// Create socket.io instance
 const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL,
-    credentials: true
-  },
-  transports: ["polling"] // safe for Railway free tier
+  cors: { origin: "*" }
 });
 
 // Make io accessible in controllers
@@ -22,8 +18,5 @@ app.set("io", io);
 // Setup socket handlers
 socketSetup(io);
 
-// ===== Listen on dynamic port =====
-const PORT = process.env.PORT || 3000; // Railway injects PORT
-server.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -7,7 +7,7 @@ exports.create = async (imageData) => {
     console.log('💾 Storing image in database...');
     
     const [result] = await db.query(
-      `INSERT INTO Images (car_id, image_data, originalName, mimeType, fileSize) 
+      `INSERT INTO images (car_id, image_data, originalName, mimeType, fileSize) 
        VALUES (?, ?, ?, ?, ?)`,
       [
         imageData.car_id,
@@ -29,7 +29,7 @@ exports.create = async (imageData) => {
 exports.findById = async (id) => {
   try {
     const [rows] = await db.query(
-      'SELECT id, car_id, image_data, originalName, mimeType, fileSize FROM Images WHERE id = ?',
+      'SELECT id, car_id, image_data, originalName, mimeType, fileSize FROM images WHERE id = ?',
       [id]
     );
     return rows[0] || null;
@@ -42,7 +42,7 @@ exports.findById = async (id) => {
 exports.findByIdMetadata = async (id) => {
   try {
     const [rows] = await db.query(
-      'SELECT id, car_id, originalName, mimeType, fileSize, created_at FROM Images WHERE id = ?',
+      'SELECT id, car_id, originalName, mimeType, fileSize, created_at FROM images WHERE id = ?',
       [id]
     );
     return rows[0] || null;
@@ -55,7 +55,7 @@ exports.findByIdMetadata = async (id) => {
 exports.findByCarId = async (carId) => {
   try {
     const [rows] = await db.query(
-      'SELECT id, car_id, originalName, mimeType, fileSize, created_at FROM Images WHERE car_id = ? ORDER BY created_at DESC',
+      'SELECT id, car_id, originalName, mimeType, fileSize, created_at FROM images WHERE car_id = ? ORDER BY created_at DESC',
       [carId]
     );
     return rows || [];
@@ -67,7 +67,7 @@ exports.findByCarId = async (carId) => {
 
 exports.delete = async (id) => {
   try {
-    const [result] = await db.query('DELETE FROM Images WHERE id = ?', [id]);
+    const [result] = await db.query('DELETE FROM images WHERE id = ?', [id]);
     return result.affectedRows;
   } catch (error) {
     console.error('❌ Error deleting image:', error);
@@ -77,7 +77,7 @@ exports.delete = async (id) => {
 
 exports.deleteByCarId = async (carId) => {
   try {
-    const [result] = await db.query('DELETE FROM Images WHERE car_id = ?', [carId]);
+    const [result] = await db.query('DELETE FROM images WHERE car_id = ?', [carId]);
     return result.affectedRows;
   } catch (error) {
     console.error('❌ Error deleting images by car ID:', error);
