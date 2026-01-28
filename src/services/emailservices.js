@@ -1,21 +1,40 @@
 const nodemailer = require('nodemailer');
 const config = require('../config/env');
 
+// Add debug logging
+console.log('📧 Email Configuration:');
+console.log('  Host:', process.env.SMTP_HOST);
+console.log('  Port:', process.env.SMTP_PORT);
+console.log('  User:', process.env.SMTP_USER);
+console.log('  Pass:', process.env.SMTP_PASS ? '***set***' : '***NOT SET***');
+
 // Create transporter
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
-  secure: false,
+  secure: false, // Use TLS
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS  // ← Must have spaces: "pryi jvwd jcam nrov"
+    pass: process.env.SMTP_PASS
   },
   tls: {
     rejectUnauthorized: false
   },
-  connectionTimeout: 10000,  // ← ADD THIS
-  socketTimeout: 10000        // ← ADD THIS
+  connectionTimeout: 15000,  // Increased to 15 seconds
+  socketTimeout: 15000,
+  greetingTimeout: 15000
 });
+
+// Test connection on startup
+transporter.verify(function(error, success) {
+  if (error) {
+    console.error('❌ Email transporter verification failed:', error);
+  } else {
+    console.log('✅ Email server is ready to send messages');
+  }
+});
+
+// Rest of your code stays the same...
 
 // ✅ Send verification email with 6-digit code
 exports.sendVerificationEmail = async (email, verificationCode) => {
