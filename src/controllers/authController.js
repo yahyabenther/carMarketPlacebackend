@@ -5,6 +5,7 @@ const emailService = require('../services/emailservices');
 const config = require('../config/env');
 
 // ✅ REGISTER - Create user and send verification code
+// ✅ REGISTER - Create user and send verification code
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -25,7 +26,7 @@ exports.register = async (req, res) => {
 
     // Generate 6-digit verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const verificationCodeExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    const verificationCodeExpiry = new Date(Date.now() + 15 * 60 * 1000);
 
     // Create user
     const userId = await userService.create({
@@ -40,14 +41,25 @@ exports.register = async (req, res) => {
     console.log(`✅ User registered: ${email}`);
     console.log(`🔑 Verification code: ${verificationCode}`);
 
-    // Send verification email
-    await emailService.sendVerificationEmail(email, verificationCode);
+    // ← SEND EMAIL WITH TIMEOUT (don't wait for it)
+    try {
+      // Don't await - send async without blocking
+      emailService.sendVerificationEmail(email, verificationCode)
+        .catch(err => console.error('Email send failed (async):', err.message));
+      
+      console.log('📧 Email queued for sending (async)');
+    } catch (emailError) {
+      console.error('⚠️ Email queue error:', emailError.message);
+      // Continue anyway - user is created
+    }
 
+    // ← RETURN IMMEDIATELY (don't wait for email)
     res.status(201).json({
       message: 'User registered successfully. Check your email for the verification code.',
       userId,
       email
     });
+
   } catch (err) {
     console.error('🔥 Register error:', err);
     res.status(500).json({ message: 'Server error during registration' });
