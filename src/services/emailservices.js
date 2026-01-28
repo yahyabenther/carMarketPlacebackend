@@ -3,18 +3,18 @@ const config = require('../config/env');
 
 // Create transporter
 const transporter = nodemailer.createTransport({
- host: 'smtp.gmail.com', // Using the name is fine now that IPv4 is forced
-  port: 587,
-  secure: false, 
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false,
   auth: {
-    // Force the use of process.env directly to ensure they aren't missing
-    user: process.env.SMTP_USER, 
-    pass: process.env.SMTP_PASS
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS  // ← Must have spaces: "pryi jvwd jcam nrov"
   },
   tls: {
     rejectUnauthorized: false
-  }
-
+  },
+  connectionTimeout: 10000,  // ← ADD THIS
+  socketTimeout: 10000        // ← ADD THIS
 });
 
 // ✅ Send verification email with 6-digit code
