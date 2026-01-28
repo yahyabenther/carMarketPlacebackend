@@ -1,4 +1,4 @@
-// COMPLETE FIX: src/config/db.js
+// FIXED: src/config/db.js
 
 const mysql = require('mysql2/promise');
 const config = require('./env');
@@ -16,20 +16,17 @@ const pool = mysql.createPool({
   
   // CONNECTION POOL SETTINGS
   waitForConnections: true,
-  connectionLimit: 3,                    // REDUCED from 10 to 3 (very conservative for limited resources)
-  queueLimit: 0,
+  connectionLimit: 15,        // ← INCREASED from 3 to 15 for production
+  queueLimit: 10,             // Queue up to 10 requests
   
   // TIMEOUT SETTINGS (CRITICAL)
-  connectTimeout: 30000,                 // 30 seconds to establish connection
-  acquireTimeout: 30000,                 // 30 seconds to acquire from pool
-  idleTimeout: 30000,                    // 30 seconds before closing idle connections
+  connectTimeout: 30000,      // 30 seconds to establish connection
+  acquireTimeout: 15000,      // 15 seconds to acquire from pool
+  idleTimeout: 60000,         // 60 seconds before closing idle connections
   
   // KEEP-ALIVE & RECONNECT
   enableKeepAlive: true,
   keepAliveInitialDelayMs: 0,
-  authPlugins: {
-    mysql_clear_password: () => () => config.db.password,
-  },
 });
 
 // CONNECTION POOL EVENT HANDLERS
@@ -42,7 +39,7 @@ pool.on('acquire', (connection) => {
 });
 
 pool.on('enqueue', () => {
-  console.log('⏳ MySQL: Connection request queued');
+  console.log('⏳ MySQL: Connection request queued (waiting for available connection)');
 });
 
 pool.on('release', (connection) => {
@@ -63,6 +60,9 @@ pool.on('error', (err) => {
   }
   if (err.code === 'PROTOCOL_SOCKET_TIMEOUT') {
     console.error('   → Socket timeout occurred');
+  }
+  if (err.code === 'ER_CON_COUNT_ERROR') {
+    console.error('   → Too many connections to MySQL');
   }
 });
 
