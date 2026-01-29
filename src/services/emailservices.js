@@ -18,7 +18,7 @@ exports.sendVerificationEmail = async (email, verificationCode) => {
     
     sendSmtpEmail.subject = '✉️ Verify Your Email - CarHub';
     sendSmtpEmail.to = [{ email: email }];
-    sendSmtpEmail.sender = { name: 'CarHub', email: 'noreply@carhub.app' };
+    sendSmtpEmail.sender = { name: 'CarHub', email: 'yahyabentaher45@gmail.com' }; // ✅ CHANGED
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -146,7 +146,7 @@ exports.sendPasswordResetEmail = async (email, resetCode) => {
     
     sendSmtpEmail.subject = '🔐 Reset Your Password - CarHub';
     sendSmtpEmail.to = [{ email: email }];
-    sendSmtpEmail.sender = { name: 'CarHub', email: 'noreply@carhub.app' };
+    sendSmtpEmail.sender = { name: 'CarHub', email: 'yahyabentaher45@gmail.com' }; // ✅ CHANGED
     sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>
