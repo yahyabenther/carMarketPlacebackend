@@ -1,11 +1,11 @@
 const brevo = require('@getbrevo/brevo');
 
-// Initialize Brevo API
-const apiInstance = new brevo.TransactionalEmailsApi();
-apiInstance.setApiKey(
-  brevo.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY
-);
+// Initialize Brevo API client
+let apiInstance = new brevo.TransactionalEmailsApi();
+
+// Set API key
+let apiKey = apiInstance.authentications['apiKey'];
+apiKey.apiKey = process.env.BREVO_API_KEY;
 
 console.log('🔑 Brevo API Key:', process.env.BREVO_API_KEY ? 'Set ✅' : 'NOT SET ❌');
 
@@ -14,7 +14,8 @@ exports.sendVerificationEmail = async (email, verificationCode) => {
   try {
     console.log('📧 Sending verification email to:', email);
     
-    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    let sendSmtpEmail = new brevo.SendSmtpEmail();
+    
     sendSmtpEmail.subject = '✉️ Verify Your Email - CarHub';
     sendSmtpEmail.to = [{ email: email }];
     sendSmtpEmail.sender = { name: 'CarHub', email: 'noreply@carhub.app' };
@@ -112,7 +113,7 @@ exports.sendVerificationEmail = async (email, verificationCode) => {
               </div>
               
               <p style="margin-top: 20px;">
-                <strong>Important:</strong> Never share this code with anyone. We will never ask for this code via email or message.
+                <strong>Important:</strong> Never share this code with anyone.
               </p>
               
               <p>If you didn't create this account, please ignore this email.</p>
@@ -126,12 +127,12 @@ exports.sendVerificationEmail = async (email, verificationCode) => {
       </html>
     `;
 
-    const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log('✅ Verification email sent to:', email);
-    console.log('📬 Message ID:', result.messageId);
+    console.log('📬 Brevo Response:', JSON.stringify(data));
     return true;
   } catch (error) {
-    console.error('❌ Brevo error:', error);
+    console.error('❌ Brevo error:', error.response ? error.response.body : error);
     throw new Error('Failed to send verification email');
   }
 };
@@ -141,7 +142,8 @@ exports.sendPasswordResetEmail = async (email, resetCode) => {
   try {
     console.log('📧 Sending password reset email to:', email);
     
-    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    let sendSmtpEmail = new brevo.SendSmtpEmail();
+    
     sendSmtpEmail.subject = '🔐 Reset Your Password - CarHub';
     sendSmtpEmail.to = [{ email: email }];
     sendSmtpEmail.sender = { name: 'CarHub', email: 'noreply@carhub.app' };
@@ -238,16 +240,14 @@ exports.sendPasswordResetEmail = async (email, resetCode) => {
               <div class="code-box">${resetCode}</div>
               
               <div class="warning">
-                <strong>⚠️ Security Alert:</strong> If you didn't request this password reset, please ignore this email and your password will remain unchanged.
+                <strong>⚠️ Security Alert:</strong> If you didn't request this, please ignore this email.
               </div>
               
-              <p style="margin-top: 20px;">
-                <strong>Security Tips:</strong>
-              </p>
+              <p style="margin-top: 20px;"><strong>Security Tips:</strong></p>
               <ul>
                 <li>Never share this code with anyone</li>
                 <li>This code expires in 15 minutes</li>
-                <li>Make sure your new password is strong and unique</li>
+                <li>Make sure your new password is strong</li>
               </ul>
             </div>
             
@@ -259,12 +259,12 @@ exports.sendPasswordResetEmail = async (email, resetCode) => {
       </html>
     `;
 
-    const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log('✅ Password reset email sent to:', email);
-    console.log('📬 Message ID:', result.messageId);
+    console.log('📬 Brevo Response:', JSON.stringify(data));
     return true;
   } catch (error) {
-    console.error('❌ Brevo error:', error);
+    console.error('❌ Brevo error:', error.response ? error.response.body : error);
     throw new Error('Failed to send password reset email');
   }
 };
